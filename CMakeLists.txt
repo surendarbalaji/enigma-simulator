@@ -21,6 +21,10 @@ FetchContent_MakeAvailable(raylib)
 # source files
 set(PROJECT_SOURCES
         main.c
+        rotors.c
+        rotors.h
+        conversions.c
+        conversions.h
 )
 
 # executables

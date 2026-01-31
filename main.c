@@ -1,41 +1,6 @@
-#include <stdio.h>
 #include "raylib.h"
-
-
-typedef struct {
-    int configuration[26];
-    int switchNotch;
-    int turnSetting;
-} Rotor;
-
-int rotorPass(Rotor* rotor, int input) {
-
-    rotor->turnSetting++;
-    return rotor->configuration[input + rotor->turnSetting - 1];
-
-}
-
-int toValue(int ascii) {
-
-    int keyValue = 0;
-
-    if (ascii >= 'a' && ascii <= 'z') keyValue = ascii - 96;
-    else if (ascii >= 'A' && ascii <= 'Z') keyValue = ascii - 64;
-
-    return keyValue;
-
-}
-
-int toAscii(int keyValue) {
-
-    int character = 0;
-
-    if (keyValue >= 1 && keyValue <= 26) character = keyValue + 64;
-
-    return character;
-
-}
-
+#include "rotors.h"
+#include "conversions.h"
 
 bool IsAnyKeyPressed() {
     bool keyPressed = false;
@@ -53,30 +18,40 @@ int main(void) {
 
     InitWindow(screenWidth, screenHeight, "Enigma Sim");
 
-    Rotor rotor1;
-    int rotor1_setting[26] = {4, 13, 20, 23, 19, 9, 12, 18, 21, 25, 17, 14, 11, 6, 5, 10, 3, 1, 26, 2, 16, 7, 24, 15, 8, 22};
-    rotor1.switchNotch = 18;
-    rotor1.turnSetting = 0;
+    // left-most rotor is usually rotor 3
+    // Enigma I from 1930
 
-    for (int i = 0; i < 26; i++ ) {
-        rotor1.configuration[i] = rotor1_setting[i];
-    }
+    int rotorIII_config[26] = {2, 4, 6, 8, 10, 12, 3, 16, 18, 20, 24, 22, 26, 14, 25, 5, 9, 23, 7, 1, 11, 13, 21, 19, 17, 15};
+    Rotor rotorRight = InitialiseRotor(rotorIII_config,22,0);
+
+    int rotorII_config[26] = {1, 10, 4, 11, 19, 9, 18, 21, 24, 2, 12, 8, 23, 20, 18, 3, 17, 7, 26, 14, 25, 6, 22, 15, 5};
+    Rotor rotorMiddle = InitialiseRotor(rotorII_config,5,0);
+
+    int rotorI_config[26] = {5, 11, 13, 6, 12, 7, 4, 17, 22, 26, 14, 20, 15, 23, 25, 8, 24, 21, 19, 16, 1, 9, 2, 18, 3, 10};
+    Rotor rotorLeft = InitialiseRotor(rotorI_config,17,0);
 
     while (!WindowShouldClose()) {
 
         if (IsAnyKeyPressed()) {
+
             int keyValue = 0;
             int key = GetCharPressed();
-            if (key > 0) TraceLog(LOG_INFO, "Key Pressed: %c (Ascii: %d)", key, key);
+            TraceLog(LOG_INFO, "Key Pressed: %c (Ascii: %d)", key, key);
+
+            turn(&rotorRight, &rotorMiddle, &rotorLeft);
 
             keyValue = toValue(key);
+            TraceLog(LOG_INFO, "Right Rotor Input: %d", keyValue);
 
-            if (key > 0) TraceLog(LOG_INFO, "Key Value: %d", keyValue);
+            int forwardRight = forwardEncipher(&rotorRight, keyValue);
+            TraceLog(LOG_INFO, "Middle Rotor Input: %d (%c)", forwardRight, toAscii(forwardRight));
 
-            int ciphered = rotorPass(&rotor1, keyValue);
+            int forwardMiddle = forwardEncipher(&rotorMiddle, forwardRight);
+            TraceLog(LOG_INFO, "Left Rotor Input: %d (%c)", forwardMiddle, toAscii(forwardMiddle));
 
-            if (ciphered > 0) TraceLog(LOG_INFO, "Ciphered Value: %d", ciphered);
-            if (ciphered > 0) TraceLog(LOG_INFO, "Ciphered Character: %c (%d)", toAscii(ciphered), toAscii(ciphered));
+            int forwardLeft = forwardEncipher(&rotorLeft, forwardMiddle);
+            TraceLog(LOG_INFO, "Reflector Input: %d (%c)", forwardLeft, toAscii(forwardLeft));
+
 
         }
 
