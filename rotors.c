@@ -6,7 +6,7 @@ Rotor InitialiseRotor(int configuration[26], int switchNotch, int position) {
 
     for (int i = 0; i < 26; i++ ) {
         rotor.configuration[i] = configuration[i];
-        rotor.reverseConfiguration[configuration[i] - 1] = i + 1; // reversed with additions for 0 index
+        rotor.reverseConfiguration[configuration[i]] = i; // reversed (this is big brain time)
     }
 
     rotor.switchNotch = switchNotch; // the location of the physical notch which allows for the subsequent rotor to rotate
@@ -30,12 +30,12 @@ void turn(Rotor* rotorRight, Rotor* rotorMiddle, Rotor* rotorLeft) {
 
 
 int forwardEncipher(const Rotor* rotor, int input) {
-    int index = (input + rotor->position - 1) % 26;
-    return (rotor->configuration[index] - (rotor->position % 26));
+    int index = (input + rotor->position + 26) % 26;
+    return (rotor->configuration[index] - rotor->position) % 26;
 }
 
 int reverseEncipher(const Rotor* rotor, int input) {
-    int index = (input + rotor->position - 1) % 26;
-    return (rotor->reverseConfiguration[index] - (rotor->position % 26));
+    int index = (input + rotor->position + 26) % 26;
+    return (rotor->reverseConfiguration[index] - rotor->position + 26) % 26;
 }
 

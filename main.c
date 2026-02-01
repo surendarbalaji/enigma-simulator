@@ -2,53 +2,59 @@
 #include "rotors.h"
 #include "conversions.h"
 
-bool IsAnyKeyPressed() {
-    bool keyPressed = false;
-    int key = GetKeyPressed();
+#define LIGHTERGRAY (Color) { 235, 235, 235, 230 }
 
-    if ((key >= 32) && (key <= 126)) keyPressed = true;
-
-    return keyPressed;
-}
 
 int main(void) {
 
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = 1600;
+    const int screenHeight = 900;
 
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(screenWidth, screenHeight, "Enigma Sim");
 
     // left-most rotor is usually rotor 3
     // Enigma I from 1930
 
-    int rotorIII_config[26] = {2, 4, 6, 8, 10, 12, 3, 16, 18, 20, 24, 22, 26, 14, 25, 5, 9, 23, 7, 1, 11, 13, 21, 19, 17, 15};
-    Rotor rotorRight = InitialiseRotor(rotorIII_config,22,0);
+    int rotorIII_config[26] = {1, 3, 5, 7, 9, 11, 2, 15, 17, 19, 23, 21, 25, 13, 24, 4, 8, 22, 6, 0, 10, 12, 20, 18, 16, 14};
+    Rotor rotorRight = InitialiseRotor(rotorIII_config,21,0);
 
-    int rotorII_config[26] = {1, 10, 4, 11, 19, 9, 18, 21, 24, 2, 12, 8, 23, 20, 13, 3, 17, 7, 26, 14, 25, 6, 22, 15, 5};
-    Rotor rotorMiddle = InitialiseRotor(rotorII_config,5,0);
+    int rotorII_config[26] = {0, 9, 3, 10, 18, 8, 17, 20, 23, 1, 11, 7, 22, 19, 12, 2, 16, 6, 25, 13, 15, 24, 5, 21, 14, 4};
+    Rotor rotorMiddle = InitialiseRotor(rotorII_config,4,0);
 
-    int rotorI_config[26] = {5, 11, 13, 6, 12, 7, 4, 17, 22, 26, 14, 20, 15, 23, 25, 8, 24, 21, 19, 16, 1, 9, 2, 18, 3, 10};
-    Rotor rotorLeft = InitialiseRotor(rotorI_config,17,0);
+    int rotorI_config[26] = {4, 10, 12, 5, 11, 6, 3, 16, 21, 25, 13, 19, 14, 22, 24, 7, 23, 20, 18, 15, 0, 8, 1, 17, 2, 9};
+    Rotor rotorLeft = InitialiseRotor(rotorI_config,16,0);
 
     // just initialising the reflector and plugboard as a (technically stationary) rotor since it doens't seem worth creating a separate struct
 
-    int ukwb_config[26] = {25, 18, 21, 8, 17, 19, 12, 4, 16, 24, 14, 7, 15, 11, 13, 9, 5, 2, 6, 26, 3, 23, 22, 10, 1, 20};
+    int ukwb_config[26] = {24, 17, 20, 7, 16, 18, 11, 3, 15, 23, 13, 6, 14, 10, 12, 8, 4, 1, 5, 25, 2, 22, 21, 9, 0, 19};
     Rotor reflector = InitialiseRotor(ukwb_config, -1, 0);
 
-    Rotor plugboard_config[26] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26};
+    Rotor plugboard_config[26] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
     Rotor plugboard = InitialiseRotor(plugboard_config, -1, 0);
+
+
+    // initialising keyboard keys
+
+    const char* keysLine1[9] = {"Q", "W", "E", "R", "T", "Z", "U", "I", "O"};
+    const char* keysLine2[8] = {"A", "S", "D", "F", "G", "H", "J", "K"};
+    const char* keysLine3[9] = {"P", "X", "C", "V", "B", "N", "N", "M", "L"};
 
     while (!WindowShouldClose()) {
 
-        if (IsAnyKeyPressed()) {
+        int key = GetCharPressed();
 
-            int keyValue = 0;
-            int key = GetCharPressed();
+        if ((key >= 65 && key <= 90) || (key >= 97 && key <= 122)) {
+
+            // if valid input, pass through the enigma machine;
+
             TraceLog(LOG_INFO, "Key Pressed: %c (Ascii: %d)", key, key);
 
             turn(&rotorRight, &rotorMiddle, &rotorLeft);
 
-            keyValue = toValue(key);
+            TraceLog(LOG_INFO, "Rotor Position %d (%c), %d (%c), %d (%c)", rotorLeft.position, toAscii(rotorLeft.position), rotorMiddle.position, toAscii(rotorMiddle.position), rotorRight.position, toAscii(rotorRight.position));
+
+            int keyValue = toValue(key);
             TraceLog(LOG_INFO, "Plugboard Input: %d", keyValue);
 
             int forwardPlugboard = forwardEncipher(&plugboard, keyValue);
@@ -78,20 +84,37 @@ int main(void) {
             int output = forwardEncipher(&plugboard, reverseRight);
             TraceLog(LOG_INFO, "output: %d (%c)", output, toAscii(output));
 
-
         }
 
-        BeginDrawing();
+            BeginDrawing();
 
-            ClearBackground(RAYWHITE);
+                ClearBackground(RAYWHITE);
 
-            DrawText("Enigma Single Rotor", 26, 38, 29, LIGHTGRAY);
+                DrawText("Enigma Keyboard", 26, 38, 29, LIGHTGRAY);
 
-        EndDrawing();
+                DrawRectangle(screenWidth/4, 9*screenHeight/16, screenWidth/2, screenHeight/4, LIGHTERGRAY);
 
-    }
+                for (int i = 1; i < 10; i++) {
+                    DrawCircleLines(screenWidth/4 + i * screenWidth/20, 9*screenHeight/16 + screenHeight/16, 20.0f, LIGHTGRAY);
+                    DrawText(keysLine1[i-1], screenWidth/4 + i * screenWidth/20, 9*screenHeight/16 + screenHeight/16, 15, GRAY);
+                }
+
+                for (int i = 0; i < 8; i++) {
+                    DrawCircleLines( (screenWidth/4) +  (3*screenWidth/40) + (i * screenWidth/20), 9*screenHeight/16 + 2*screenHeight/16, 20.0f, LIGHTGRAY);
+                    DrawText(keysLine2[i], (screenWidth/4) +  (3*screenWidth/40) + (i * screenWidth/20), 9*screenHeight/16 + 2*screenHeight/16, 15, GRAY);
+                }
+
+                for (int i = 1; i < 10; i++) {
+                    DrawCircleLines(screenWidth/4 + i * screenWidth/20, 9*screenHeight/16 + 3*screenHeight/16, 20.0f, LIGHTGRAY);
+                    DrawText(keysLine3[i-1], screenWidth/4 + i * screenWidth/20, 9*screenHeight/16 + 3*screenHeight/16, 15, GRAY);
+                }
+
+            EndDrawing();
+
+        }
 
     CloseWindow();
 
     return 0;
+
 }
