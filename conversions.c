@@ -10,3 +10,8 @@ int toAscii(int keyValue) {
     if (keyValue >= 0 && keyValue <= 25) return (keyValue + 65);
     return -1;
 }
+
+int toUpper(int key) {
+    if (key >= 'a' && key <= 'z') return key - 32;
+    else return key;
+}

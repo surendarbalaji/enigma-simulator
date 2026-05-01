@@ -25,6 +25,8 @@ set(PROJECT_SOURCES
         rotors.h
         conversions.c
         conversions.h
+        textWrap.c
+        textWrap.h
 )
 
 # executables

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "rotors.h"
 
 Rotor InitialiseRotor(int configuration[26], int switchNotch, int position) {
@@ -29,11 +28,13 @@ void turn(Rotor* rotorRight, Rotor* rotorMiddle, Rotor* rotorLeft) {
 }
 
 
+// subtracting rotor position from returned value since rotor's physically move all inputs and outputs, necessitating converting back before feeding into the next modular component so simulate physical turn
 int forwardEncipher(const Rotor* rotor, int input) {
     int index = (input + rotor->position + 26) % 26;
-    return (rotor->configuration[index] - rotor->position) % 26;
+    return (((rotor->configuration[index] - rotor->position) % 26 + 26) % 26);
 }
 
+// same in reverse
 int reverseEncipher(const Rotor* rotor, int input) {
     int index = (input + rotor->position + 26) % 26;
     return (rotor->reverseConfiguration[index] - rotor->position + 26) % 26;
