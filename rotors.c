@@ -11,7 +11,7 @@ Rotor InitialiseRotor(int configuration[26], int switchNotch, int position) {
     rotor.switchNotch = switchNotch; // the location of the physical notch which allows for the subsequent rotor to rotate
     rotor.position = position; // current position of the rotor
 
-    return rotor; // i used this method of returning fake objects in the constructions code which seemed to work well since these structs are fairly small
+    return rotor; // i used this method of returning fake objects in the constructions code which seemed to work well since these structs are fairly small.
 }
 
 

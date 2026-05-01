@@ -37,3 +37,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 # including directories
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if (EMSCRIPTEN)
+    # Force the compiler to output an HTML file instead of a blank binary
+    set_target_properties(EnigmaSim PROPERTIES SUFFIX ".html")
+
+    # Emscripten specific web flags and resource packaging
+    target_link_options(EnigmaSim PRIVATE
+            "-sUSE_GLFW=3"
+            "-sASYNCIFY=1"
+            "--preload-file" "${CMAKE_CURRENT_SOURCE_DIR}/resources@../resources"
+    )
+endif()

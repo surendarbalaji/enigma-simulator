@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "raylib.h"
 #include "rotors.h"
@@ -61,7 +62,7 @@ int main(void) {
     int ukwb_config[26] = {24, 17, 20, 7, 16, 18, 11, 3, 15, 23, 13, 6, 14, 10, 12, 8, 4, 1, 5, 25, 2, 22, 21, 9, 0, 19};
     Rotor reflector = InitialiseRotor(ukwb_config, -1, 0);
 
-    Rotor plugboard_config[26] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
+    int plugboard_config[26] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
     Rotor plugboard = InitialiseRotor(plugboard_config, -1, 0);
 
     // initialising keyboard keys
